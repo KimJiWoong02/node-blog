@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>게시글</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
+
+    <style>
+        .doc{
+            padding: 20px;
+        }
+
+        h1 {
+            margin-bottom: 30px;
+        }
+
+        .comment {
+            margin-top: 40px;
+        }
+
+    </style>
+
+    <script>
+        $(document).ready(function () {
+            show_comment();
+        });
+
+        function render_comment(comment) {
+            let to_html;
+            to_html = `<li>
+			<p>text: ${comment["text"]}</p>
+            <p>author: ${comment["author"]}</p>
+			<button onclick="delete_comment(${comment['commentId']})" type="button" class="btn btn-outline-primary">삭제</button>
+			<button onclick="update_comment(${comment['commentId']})" type="button" class="btn btn-outline-primary">수정</button>
+            <hr>
+		</li>`;
+            $("#comment-list").append(to_html);
+        }
+
+        function show_comment() {
+            const postId = window.location.toString().split('/')[5];
+            $.ajax({
+                type: "GET",
+                url: `/api/posts/${postId}/comments`,
+                data: {},
+                success: function (response) {
+                    console.log(response);
+                    $("#comment-list").empty();
+                    response.comments.map(render_comment);
+                }
+            });
+        }
+
+        function save_comment() {
+            const postId = window.location.toString().split('/')[5];
+            $.ajax({
+                type: "POST",
+                url: `/api/posts/${postId}/comments`,
+                data: {
+                    text: $("#text").val(),
+                    author: $("#author").val(),
+                },
+                success: function (response) {
+                    console.log(response);
+                    alert(response.result)
+                    show_comment();
+                }
+            });
+        }
+
+        function update_comment(commentId) {
+            const postId = window.location.toString().split('/')[5];
+            $.ajax({
+                type: "PATCH",
+                url: `/api/posts/${postId}/comments/${commentId}`,
+                data: {
+                    text: $("#text").val(),
+                    author: $("#author").val(),
+                },
+                success: function (response) {
+                    console.log(response);
+                    alert(response.result)
+                    show_comment();
+                }
+            });
+        }
+
+        function delete_comment(commentId) {
+            const postId = window.location.toString().split('/')[5];
+            $.ajax({
+                type: "DELETE",
+                url: `/api/posts/${postId}/comments/${commentId}`,
+                data: {},
+                success: function (response) {
+                    console.log(response);
+                    alert(response.result)
+                    show_comment();
+                }
+            });
+        }
+
+    </script>
+</head>
+
+<body>
+    <div class="doc">
+    <h1> 제목: <%= posts.title %> </h1>
+    <p> 글쓴이: <%= posts.author %> </p>
+    <p> 내용: <%= posts.content %> </p>
+
+    <div>
+        <form class="row gy-2 gx-3 align-items-center">
+            <div class="col-auto">
+                <label class="visually-hidden" for="autoSizingInput">text</label>
+                <input type="text" class="form-control" id="text" placeholder="text">
+            </div>
+            <div class="col-auto">
+                <label class="visually-hidden" for="autoSizingInput">author</label>
+                <input type="text" class="form-control" id="author" placeholder="author">
+            </div>
+            <div class="col-auto">
+                <button onclick=save_comment() class="btn btn-primary">추가</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="comment">
+        <ol id="comment-list">
+        </ol>
+    </div>
+</div>
+</body>
+
+</html>
