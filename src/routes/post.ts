@@ -51,6 +51,8 @@ router.patch("/:postId", async (req, res) => {
     const post = await Post.findOne({ postId }).exec(); // Id로 클릭한 post의 Data를 찾아온다
     if (post === null) return res.status(200).send({result: "수정하려는 게시글이 없습니다."})
 
+    if (title === "" && content === "" && author === "") return res.status(200).send({result: "수정 내용을 입력해주세요."})
+
     // 제목 입력 시 제목 변경
     if(title !== "") post.title = title;
     // 내용 입력 시 제목 변경
