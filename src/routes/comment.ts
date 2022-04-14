@@ -1,13 +1,17 @@
-const express = require('express');
-const Comment = require('../schemas/comment')
+import express, {Request} from 'express';
+import Comment from '../schemas/comment';
 const router = express.Router({ mergeParams: true }); // 부모 라우터에서 자식 라우터에게 req.params를 넘겨줄 수 있다.
 
 
 // 6. 댓글 목록 조회
 //     - 조회하는 게시글에 작성된 모든 댓글을 목록 형식으로 볼 수 있도록 하기
 //     - 작성 날짜 기준으로 내림차순 정렬하기
-router.get("/", async (req, res) => {
+router.get("/", async (req: Request, res) => {
+    // TODO: TS2339: Property 'postId' does not exist on type '{}'.
+    // req에 Request 타입 적용해서 해결
+    // import에 {Request} 해야한다
     const { postId } = req.params;
+    
     const comments = await Comment.find({ postId }).sort({createdAt: -1}).exec();
 
     res.status(200).send({comments});
@@ -16,7 +20,7 @@ router.get("/", async (req, res) => {
 // 7. 댓글 작성
 //     - 댓글 내용을 비워둔 채 댓글 작성 API를 호출하면 "댓글 내용을 입력해주세요" 라는 메세지를 return하기
 //     - 댓글 내용을 입력하고 댓글 작성 API를 호출한 경우 작성한 댓글을 추가하기
-router.post("/", async (req, res) => {
+router.post("/", async (req: Request, res) => {
     const { postId } = req.params;
     let { text, author } = req.body;
 
@@ -48,6 +52,7 @@ router.patch("/:commentId", async (req, res) => {
     if (text === "") return res.send({result: "댓글 내용을 입력해주세요"})
 
     const comment = await Comment.findOne({ commentId }).exec(); // Id로 클릭한 comment의 Data를 찾아온다
+    if (comment === null) return res.status(200).send({result: "수정하려는 댓글이 없습니다."})
 
     comment.text = text;
 
@@ -65,9 +70,11 @@ router.delete("/:commentId", async (req, res) => {
     const { commentId } = req.params;
   
     const comment = await Comment.findOne({ commentId }).exec();
+    if (comment === null) return res.status(200).send({result: "삭제하려는 댓글이 없습니다."})
+    
     await comment.delete();
   
     res.status(200).send({result: "댓글 삭제가 완료되었습니다"});
 });
   
-module.exports = router;
+export default router;

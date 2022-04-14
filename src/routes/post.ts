@@ -1,6 +1,6 @@
-const express = require('express');
-const Post = require('../schemas/post')
-const Comment = require('../schemas/comment')
+import express from 'express';
+import Post from '../schemas/post';
+import Comment from '../schemas/comment';
 const router = express.Router();
 
 
@@ -49,6 +49,7 @@ router.patch("/:postId", async (req, res) => {
     const { title, content, author} = req.body;
 
     const post = await Post.findOne({ postId }).exec(); // Id로 클릭한 post의 Data를 찾아온다
+    if (post === null) return res.status(200).send({result: "수정하려는 게시글이 없습니다."})
 
     // 제목 입력 시 제목 변경
     if(title !== "") post.title = title;
@@ -57,6 +58,7 @@ router.patch("/:postId", async (req, res) => {
     // 이름 입력 시 이름 변경
     if(author !== "") post.author = author;
     await post.save();
+    
 
     res.status(200).send({result: "게시글 수정이 완료되었습니다"})
 });
@@ -67,6 +69,8 @@ router.delete("/:postId", async (req, res) => {
     const { postId } = req.params;
   
     const post = await Post.findOne({ postId }).exec();
+    if (post === null) return res.status(200).send({result: "삭제하려는 게시글이 없습니다."})
+
     await post.delete();
 
     // post와 comment들 삭제
@@ -79,4 +83,4 @@ router.delete("/:postId", async (req, res) => {
 });
   
 
-module.exports = router;
+export default router;

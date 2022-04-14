@@ -1,21 +1,21 @@
-const express = require('express');
-const connect = require('./schemas');
-const cors = require("cors");
+import express, { Request, Response, NextFunction } from 'express';
+import connect from './schemas';
+import cors  from 'cors';
 const app = express();
 const port = 3000;
 
 connect();
 
-const postRouter = require("./routes/post");
-const commentRouter = require("./routes/comment");
+import postRouter from "./routes/post";
+import commentRouter from "./routes/comment";
 
-const requestMiddleware = (req, res, next) => {
+const requestMiddleware = (req: Request, res: Response, next: NextFunction) => {
   console.log('Request URL:', req.originalUrl, ' - ', new Date());
   next();
 };
 
-app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
+app.set("views", process.cwd() + "/views");
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json()); 
 app.use(cors());
