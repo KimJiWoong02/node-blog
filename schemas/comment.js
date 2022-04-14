@@ -11,11 +11,12 @@ const commentSchema = new mongoose.Schema({
     required: true
   },
   text: {
-    type: String
+    type: String,
+    required: true
   },
   author: {
     type: String,
-    required: true, 
+    
   },
 }, { timestamps: true });
 
