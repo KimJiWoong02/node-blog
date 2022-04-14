@@ -11,6 +11,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "postinstall": "$(yarn bin)/pm2 install typescript",
   "dependencies": {
     "cors": "^2.8.5",
     "ejs": "^3.1.6",
